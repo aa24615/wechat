@@ -51,6 +51,7 @@ class Application extends ServiceContainer
         Server\ServiceProvider::class,
         CodeTemplate\ServiceProvider::class,
         Component\ServiceProvider::class,
+        OAuth\ServiceProvider::class
     ];
 
     /**
