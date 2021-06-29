@@ -2,25 +2,23 @@
 
 declare(strict_types=1);
 
-namespace EasyWeChat\OpenPlatform;
+namespace EasyWeChat\OpenWork;
 
 use EasyWeChat\Kernel\Contracts\AccessToken as AccessTokenInterface;
 use EasyWeChat\Kernel\Exceptions\HttpException;
-use EasyWeChat\OpenPlatform\Contracts\SuiteTicket as VerifyTicketInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ComponentAccessToken implements AccessTokenInterface
+class ProviderAccessToken implements AccessTokenInterface
 {
     protected HttpClientInterface $httpClient;
     protected CacheInterface $cache;
 
     public function __construct(
-        protected string $appId,
-        protected string $secret,
-        protected VerifyTicketInterface $verifyTicket,
+        protected string $corpId,
+        protected string $providerSecret,
         protected ?string $key = null,
         ?CacheInterface $cache = null,
         ?HttpClientInterface $httpClient = null,
@@ -31,7 +29,7 @@ class ComponentAccessToken implements AccessTokenInterface
 
     public function getKey(): string
     {
-        return $this->key ?? $this->key = \sprintf('open_platform.component_access_token.%s', $this->appId);
+        return $this->key ?? $this->key = \sprintf('open_work.access_token.%s', $this->corpId);
     }
 
     public function setKey(string $key): static
@@ -59,23 +57,22 @@ class ComponentAccessToken implements AccessTokenInterface
         }
 
         $response = $this->httpClient->request(
-            'POST',
-            'cgi-bin/component/api_component_token',
+            'GET',
+            'cgi-bin/service/get_provider_token',
             [
                 'json' => [
-                    'component_appid' => $this->appId,
-                    'component_appsecret' => $this->secret,
-                    'component_verify_ticket' => $this->verifyTicket->getTicket(),
+                    'corpid' => $this->corpId,
+                    'provider_secret' => $this->providerSecret,
                 ],
             ]
         )->toArray();
 
-        if (empty($response['component_access_token'])) {
-            throw new HttpException('Failed to get component_access_token.');
+        if (empty($response['provider_access_token'])) {
+            throw new HttpException('Failed to get provider_access_token.');
         }
 
-        $this->cache->set($key, $response['component_access_token'], \abs(\intval($response['expires_in']) - 100));
+        $this->cache->set($key, $response['provider_access_token'], \abs($response['expires_in'] - 100));
 
-        return $response['component_access_token'];
+        return $response['provider_access_token'];
     }
 }

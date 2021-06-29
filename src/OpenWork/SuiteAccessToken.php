@@ -6,19 +6,21 @@ namespace EasyWeChat\OpenWork;
 
 use EasyWeChat\Kernel\Contracts\AccessToken as AccessTokenInterface;
 use EasyWeChat\Kernel\Exceptions\HttpException;
+use EasyWeChat\OpenWork\Contracts\SuiteTicket as SuiteTicketInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class AccessToken implements AccessTokenInterface
+class SuiteAccessToken implements AccessTokenInterface
 {
     protected HttpClientInterface $httpClient;
     protected CacheInterface $cache;
 
     public function __construct(
-        protected string $corpId,
-        protected string $providerSecret,
+        protected string $suiteId,
+        protected string $suiteSecret,
+        protected SuiteTicketInterface $suiteTicket,
         protected ?string $key = null,
         ?CacheInterface $cache = null,
         ?HttpClientInterface $httpClient = null,
@@ -29,7 +31,7 @@ class AccessToken implements AccessTokenInterface
 
     public function getKey(): string
     {
-        return $this->key ?? $this->key = \sprintf('open_work.access_token.%s', $this->corpId);
+        return $this->key ?? $this->key = \sprintf('open_work.suite_access_token.%s', $this->suiteId);
     }
 
     public function setKey(string $key): static
@@ -57,22 +59,23 @@ class AccessToken implements AccessTokenInterface
         }
 
         $response = $this->httpClient->request(
-            'GET',
-            'cgi-bin/service/get_provider_token',
+            'POST',
+            'cgi-bin/service/get_suite_token',
             [
-                'query' => [
-                    'corpid' => $this->corpId,
-                    'provider_secret' => $this->providerSecret,
+                'json' => [
+                    'suite_id' => $this->suiteId,
+                    'suite_secret' => $this->suiteSecret,
+                    'suite_ticket' => $this->suiteTicket->getTicket(),
                 ],
             ]
         )->toArray();
 
-        if (empty($response['provider_access_token'])) {
-            throw new HttpException('Failed to get provider_access_token.');
+        if (empty($response['suite_access_token'])) {
+            throw new HttpException('Failed to get suite_access_token.');
         }
 
-        $this->cache->set($key, $response['provider_access_token'], \abs($response['expires_in'] - 100));
+        $this->cache->set($key, $response['suite_access_token'], \abs(\intval($response['expires_in']) - 100));
 
-        return $response['provider_access_token'];
+        return $response['suite_access_token'];
     }
 }
