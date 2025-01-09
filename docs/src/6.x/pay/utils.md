@@ -114,7 +114,7 @@ $config = $utils->buildAppConfig($prepayId, $appId); // 返回数组
 
 调用示例：[官方文档 - APP 调起支付 API](https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter3_2_4.shtml)
 
-### 使用微信支付公钥加密敏感字段
+### 使用微信支付公钥加密敏感字段 <version-tag>6.17.0+</version-tag>
 
 :book: [官方文档 - 如何使用微信支付公钥加密敏感字段](https://pay.weixin.qq.com/doc/v3/merchant/4012153196)
 
