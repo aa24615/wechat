@@ -173,7 +173,7 @@ print_r($response->toArray());
 </details>
 
 <details>
-    <summary>敏感信息加密</summary>
+    <summary>敏感信息加密  <version-tag>6.17.0+</version-tag> </summary>
 
 > 官方文档：<https://pay.weixin.qq.com/doc/v3/merchant/4013053257>
 > 使用默认公钥 ID
@@ -183,7 +183,7 @@ $utils = $app->getUtils();
 $response = $app->getClient()->withSerialHeader()->postJson("v3/applyment4sub/applyment/", [
    "business_code" => "12345678",
    'contact_info'  => [
-        'contact_name'      => $utils->createRsaEncrypt('张三'),
+        'contact_name'      => $utils->encryptWithRsaPublicKey('张三'),
         //...
     ],
     //...
@@ -199,7 +199,7 @@ $utils = $app->getUtils();
 $response = $app->getClient()->withSerialHeader("PUB_KEY_ID_123456")->postJson("v3/applyment4sub/applyment/", [
    "business_code" => "12345678",
    'contact_info'  => [
-        'contact_name'      => $utils->createRsaEncrypt("张三","PUB_KEY_ID_123456"),
+        'contact_name'      => $utils->encryptWithRsaPublicKey("张三","PUB_KEY_ID_123456"),
         //...
     ],
     //...
