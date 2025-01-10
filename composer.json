@@ -62,6 +62,9 @@
     "fix-style": "vendor/bin/pint",
     "test": "phpunit --colors"
   },
+  "conflict": {
+    "overtrue/wechat": "*"
+  },
   "config": {
     "allow-plugins": {
       "composer/package-versions-deprecated": true,
