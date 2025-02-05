@@ -47,8 +47,7 @@ class Response implements Arrayable, ArrayAccess, Jsonable, ResponseInterface, S
         protected ResponseInterface $response,
         protected ?Closure $failureJudge = null,
         protected bool $throw = true
-    ) {
-    }
+    ) {}
 
     public function throw(bool $throw = true): static
     {

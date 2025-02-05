@@ -23,9 +23,7 @@ use function time;
 
 class Signature
 {
-    public function __construct(protected MerchantInterface $merchant)
-    {
-    }
+    public function __construct(protected MerchantInterface $merchant) {}
 
     /**
      * @param  array<string,mixed>  $options
