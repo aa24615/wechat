@@ -18,6 +18,7 @@ use EasyWeChat\Work\Contracts\Application as ApplicationInterface;
 use Overtrue\Socialite\Contracts\ProviderInterface as SocialiteProviderInterface;
 use Overtrue\Socialite\Providers\WeWork;
 
+use Psr\Log\LoggerAwareTrait;
 use function array_merge;
 
 class Application implements ApplicationInterface
@@ -27,6 +28,7 @@ class Application implements ApplicationInterface
     use InteractWithConfig;
     use InteractWithHttpClient;
     use InteractWithServerRequest;
+    use LoggerAwareTrait;
 
     protected ?Encryptor $encryptor = null;
 
@@ -88,8 +90,8 @@ class Application implements ApplicationInterface
     {
         if (! $this->server) {
             $this->server = new Server(
-                request: $this->getRequest(),
-                encryptor: $this->getEncryptor()
+                encryptor: $this->getEncryptor(),
+                request: $this->getRequest()
             );
         }
 
